@@ -1,0 +1,29 @@
+---
+
+- name: install vnstat and vnstati packages
+  package:
+    name: [ vnstat, vnstati ]
+    state: present
+
+- name: template vnstat
+  template:
+    src: vnstat.conf.j2
+    dest: /etc/vnstat.conf
+
+- name: create vnstat graphs directory
+  file:
+    path: "{{ vnstat_graph_path }}"
+    state: directory
+
+- name: set a vnstat graphs cron
+  cron:
+    name: generate vnstat graphs
+    minute: '*/16'
+    job: >
+      vnstati -s -o {{ vnstat_graph_path }}/summary.png &&
+      vnstati -h -o {{ vnstat_graph_path }}/hourly.png &&
+      vnstati -d -o {{ vnstat_graph_path }}/daily.png &&
+      vnstati -t -o {{ vnstat_graph_path }}/top10.png &&
+      vnstati -m -o {{ vnstat_graph_path }}/monthly.png
+    user: root
+    cron_file: vnstat-graphs

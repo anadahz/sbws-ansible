@@ -1,9 +1,15 @@
 # Ansible role for sbws
 
-This playbook should deploy and configure the Tor bandwidth scanner sbws running
+This role should deploy and configure the Tor bandwidth scanner sbws running
 as a non-root user with Caddy running as a webserver. Caddy-ansible role is used
 to install Caddy used here as submodule with few default variables changed (in
 [roles/sbws-ansible/defaults/main.yml](./roles/sbws-ansible/defaults/main.yml)).
+It is based and been tested for Debian based distributions.
+
+Optional: This role can install and generate vnstat graphs and display them on
+the index page
+[roles/sbws-ansible/defaults/index.html.j2](./roles/sbws-ansible/defaults/index.html.j2).
+To enable vnstat graphs generation set `vnstat_install` to `yes`.
 
 ## Clone
 
@@ -51,3 +57,4 @@ ansible-playbook --vault-id @prompt -i inventory/hosts setup.yml
 * [sbws](https://gitweb.torproject.org/sbws.git)
 * [ansible-caddy](https://github.com/antoiner77)
 * [Ansible vault documentation](https://docs.ansible.com/ansible/latest/cli/ansible-vault.html)
+* [vnstat template](https://j0hn.uk/vnstati/)

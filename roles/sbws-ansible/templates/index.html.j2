@@ -1,12 +1,58 @@
+{% if vnstat_install %}
 <html>
   <head>
+    <meta charset="utf-8">
     <title>Simple Bandwidth Scanner (sbws)</title>
   </head>
   <body>
     <h1>Simple Bandwidth Scanner</h1>
+     <br>
+    <h3>Network Statistics</h3>
     <p>
-      This service hosts a Tor bandwidth scanner
-      (<a href="{{ sbws_gitweb }}">sbws</a>).
+      <img src="{{ vnstat_graph_path|basename }}/summary.png" alt="Network Summary"/>
     </p>
+     <br>
+    <h3>Traffic statistics on a hourly basis for the last 24 hours</h3>
+    <p>
+      <img src="{{ vnstat_graph_path|basename }}/hourly.png" alt="Traffic statistics on a hourly basis for the last 24 hours"/>
+    </p>
+     <br>
+    <h3>Traffic statistics on a daily basis for the last 30 days</h3>
+    <p>
+      <img src="{{ vnstat_graph_path|basename }}/daily.png" alt="Traffic statistics on a daily basis for the last 30 days"/>
+    </p>
+     <br>
+    <h3>Traffic statistics on a monthly basis for the last 12 months</h3>
+    <p>
+      <img src="{{ vnstat_graph_path|basename }}/monthly.png" alt="Traffic statistics on a monthly basis for the last 12 months"/>
+    </p>
+     <br>
+    <h3>All time top 10 traffic days</h3>
+    <p>
+      <img src="{{ vnstat_graph_path|basename }}/top10.png" alt="All time top 10 traffic days"/>
+    </p>
+     <br>
+    <hr>
+        <p>
+          This service hosts a Tor bandwidth scanner
+          (<a href="https://gitweb.torproject.org/sbws.git">sbws</a>).
+        </p>
+    </body>
+</html>
+{% else %}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Simple Bandwidth Scanner (sbws)</title>
+  </head>
+  <body>
+    <h1>Simple Bandwidth Scanner</h1>
+     <br>
+    <hr>
+        <p>
+          This service hosts a Tor bandwidth scanner
+          (<a href="https://gitweb.torproject.org/sbws.git">sbws</a>).
+        </p>
   </body>
 </html>
+{% endif %}

@@ -4,3 +4,5 @@
 - include_tasks: install-sbws.yml
 - include_vars: "{{ playbook_dir }}/roles/sbws-ansible/defaults/main.yml"
 - include_role: { name: caddy-ansible }
+- include_tasks: vnstat.yml
+  when: vnstat_install

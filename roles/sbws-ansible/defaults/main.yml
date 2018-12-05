@@ -33,3 +33,7 @@ sbws_config_path: /etc/sbws
 sbws_bin: sbws.bin
 sbws_http_timeout: 30
 sbws_circuit_timeout: 50
+
+# Install vnstat and configure graphs
+vnstat_install: no
+vnstat_graph_path: "{{ sbws_root }}/vnstat"
