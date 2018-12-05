@@ -15,7 +15,11 @@ caddy_pgp_verify_signatures: yes
 caddy_log_ipmask: "ipmask 0.0.0.255 ffff:ffff:ffff:ff00::"
 # Uncomment to use Letsencrypt staging cert
 #caddy_additional_args: "-ca https://acme-staging.api.letsencrypt.org/directory"
+# Set index.html page in www root
+set_index: yes
 
+# Install sbws install method, default (no) is pip
+install_deb_pkg: no
 # FQDN domain of sbws
 sbws_domain: "{{ inventory_hostname }}"
 # Caddy root folder

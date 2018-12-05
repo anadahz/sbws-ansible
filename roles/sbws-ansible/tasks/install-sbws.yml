@@ -6,6 +6,7 @@
     create_home: yes
     comment: "Used to run sbws"
     state: present
+  when: not install_deb_pkg
 
 - name: create "{{ sbws_config_path }}"
   file:
@@ -14,6 +15,7 @@
   with_items:
     - "{{ sbws_config_path }}"
     - "{{ sbws_root }}"
+  when: not install_deb_pkg
 
 - name: allow 'sudo' group to have passwordless access to "{{ sbws_user }}"
   lineinfile:
@@ -21,6 +23,7 @@
     state: present
     line: "%sudo ALL=({{sbws_user }}) NOPASSWD:ALL"
     validate: '/usr/sbin/visudo -cf %s'
+  when: not install_deb_pkg
 
 - name: install sbws via pip
   become_user: "{{ sbws_user }}"
@@ -32,6 +35,7 @@
       - "stem>=1.7.0"
       - "requests[socks]>=2.11.0"
       - "git+{{ sbws_git }}"
+  when: not install_deb_pkg
 
 - name: generate "{{ sbws_bin }}" file
   shell: "head -c $((1*1024*1024*1024)) /dev/urandom > {{ sbws_bin }}"
@@ -39,7 +43,14 @@
     chdir: "{{ sbws_root }}"
     creates: "{{ sbws_bin }}"
 
-- name: template sbws specific files
+- name: template index.html page
+  template:
+    src: index.html.j2
+    dest: "{{ sbws_root }}/index.html"
+    mode: 0644
+  when: set_index
+
+- name: template sbws ini and systemd unit
   template:
     src: "{{ item.src }}.j2"
     dest: "{{ item.dest }}/{{ item.src }}"
@@ -47,7 +58,14 @@
   with_items:
     - { src: sbws.ini, dest: "{{ sbws_config_path }}" }
     - { src: sbws.service, dest: /etc/systemd/system }
-    - { src: index.html, dest: "{{ sbws_root }}" }
+  when: not install_deb_pkg
+
+- name: template sbws.ini (Debian package)
+  template:
+    src: sbws.ini.j2
+    dest: "{{ sbws_root }}/sbws.ini"
+    mode: 0644
+  when: install_deb_pkg
 
 - name: start and enable sbws service on boot
   systemd:

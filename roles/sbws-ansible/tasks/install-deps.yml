@@ -1,9 +1,8 @@
 ---
 
-# Rsync is a dependency of the synchronize module
-- name: install apt-transport-https and rsync
+- name: install apt-transport-https
   apt:
-    name: [ apt-transport-https, rsync ]
+    name: apt-transport-https
     state: present
     cache_valid_time: 36000
 
@@ -17,6 +16,26 @@
     state: present
     repo: "deb {{ tor_repo }} {{ ansible_lsb.codename }} main"
 
+- name: add Debian testing repo
+  apt_repository:
+    state: present
+    repo: "deb https://deb.debian.org/debian testing main"
+  when: install_deb_pkg
+
+- name: termplate testing preferences apt pinning file
+  template:
+    src: testing.pref.j2
+    dest: /etc/apt/preferences.d/testing.pref
+  when: install_deb_pkg
+
+- name: install tor and sbws dependencies
+  apt:
+    name: [ deb.torproject.org-keyring, tor, tor-geoipdb, sbws]
+    state: latest
+    cache_valid_time: 36000
+    install_recommends: no
+  when: install_deb_pkg
+
 - name: install tor and sbws dependencies
   apt:
     # acl package is needed to install sbws as user
@@ -24,11 +43,14 @@
     state: latest
     cache_valid_time: 36000
     install_recommends: no
+  when: not install_deb_pkg
 
 - name: check that sbws package is not installed, we install it via pip
   apt:
     name: sbws
     state: absent
+  when: not install_deb_pkg
 
 - name: upgrade pip
   pip: name=pip state=latest
+  when: not install_deb_pkg
