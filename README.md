@@ -1,15 +1,30 @@
 # Ansible role for sbws
 
+**Deployed in**: [https://sbws.lavafeld.org](https://sbws.lavafeld.org)
+
 This role should deploy and configure the Tor bandwidth scanner sbws running
 as a non-root user with Caddy running as a webserver. Caddy-ansible role is used
 to install Caddy used here as submodule with few default variables changed (in
 [roles/sbws-ansible/defaults/main.yml](./roles/sbws-ansible/defaults/main.yml)).
-It is based and been tested for Debian based distributions.
+It is based and been tested for Debian based distributions. Caddy webserver is
+being used for it's sane renewal of TLS certificates.
 
-Optional: This role can install and generate vnstat graphs and display them on
+Be default this role setups and renews (thanks to Caddy) automagically the TLS
+certificates of the defined FQDN host. An example landing page (`index.html`) is
+being placed in the root www folder, you can disable this by setting variable
+`set_index` to `no`.
+
+Sbws is being installed from PyPI in a virtual environment and runs as a
+separate user. To install sbws from the official (older) Debian package set
+the variable `install_deb_pkg` to yes.
+
+Optional: This role can install and generate vnstat graphs and expose them on
 the index page
-[roles/sbws-ansible/defaults/index.html.j2](./roles/sbws-ansible/defaults/index.html.j2).
+[roles/sbws-ansible/templates/index.html.j2](./roles/sbws-ansible/templates/index.html.j2).
 To enable vnstat graphs generation set `vnstat_install` to `yes`.
+
+The default list of variables used in this role can be found in:
+[roles/sbws-ansible/defaults/main.yml](./roles/sbws-ansible/defaults/main.yml)
 
 ## Clone
 
