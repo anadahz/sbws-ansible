@@ -1,0 +1,13 @@
+[Unit]
+Description=Simple Bandwidth Scanner
+
+[Service]
+RuntimeDirectory=sbws
+RuntimeDirectoryMode=0700
+Environment="SUPERVISED=1"
+# Do not set a config option see: https://trac.torproject.org/projects/tor/ticket/28724
+ExecStart={{ sbws_home }}/{{ sbws_venv }}/bin/python {{ sbws_home }}/{{ sbws_venv }}/bin/sbws scanner
+User={{ sbws_user }}
+
+[Install]
+WantedBy=multi-user.target

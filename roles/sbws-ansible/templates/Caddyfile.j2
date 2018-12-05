@@ -1,0 +1,8 @@
+{{ sbws_domain }} {
+    root {{ sbws_root }}
+    log / stdout {
+        {{ caddy_log_ipmask }}
+    }
+    gzip
+    tls {{ le_email }}
+}

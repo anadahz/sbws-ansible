@@ -1,0 +1,9 @@
+---
+
+# host variables for example.org
+
+# Letsencrypt email
+le_email: email@example.org
+
+# A human-readable string with chars (max 19) in a-zA-Z0-9 to identify your scanner
+sbws_nickname: nickname

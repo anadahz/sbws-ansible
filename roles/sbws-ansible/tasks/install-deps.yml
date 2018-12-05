@@ -1,0 +1,34 @@
+---
+
+# Rsync is a dependency of the synchronize module
+- name: install apt-transport-https and rsync
+  apt:
+    name: [ apt-transport-https, rsync ]
+    state: present
+    cache_valid_time: 36000
+
+- name: add install deb.torproject.org signing key
+  apt_key:
+    keyserver: keys.gnupg.net
+    id: 'A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89'
+
+- name: add deb repo "{{ tor_repo }}"
+  apt_repository:
+    state: present
+    repo: "deb {{ tor_repo }} {{ ansible_lsb.codename }} main"
+
+- name: install tor and sbws dependencies
+  apt:
+    # acl package is needed to install sbws as user
+    name: [ deb.torproject.org-keyring, tor, tor-geoipdb, python3, virtualenv, python-setuptools, python-pip, acl]
+    state: latest
+    cache_valid_time: 36000
+    install_recommends: no
+
+- name: check that sbws package is not installed, we install it via pip
+  apt:
+    name: sbws
+    state: absent
+
+- name: upgrade pip
+  pip: name=pip state=latest

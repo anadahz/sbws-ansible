@@ -1,0 +1,35 @@
+---
+
+# Tor deb repository
+tor_repo: https://deb.torproject.org/torproject.org
+
+# Caddy template file
+caddy_config: "{{ lookup('template', 'templates/Caddyfile.j2') }}"
+# Auto update Caddy
+caddy_update: no
+# Use setcap for allowing Caddy to open a low port (e.g. 80, 443)
+caddy_setcap: yes
+caddy_systemd_capabilities_enabled: True
+caddy_pgp_verify_signatures: yes
+# Caddy ip mask
+caddy_log_ipmask: "ipmask 0.0.0.255 ffff:ffff:ffff:ff00::"
+# Uncomment to use Letsencrypt staging cert
+#caddy_additional_args: "-ca https://acme-staging.api.letsencrypt.org/directory"
+
+# FQDN domain of sbws
+sbws_domain: "{{ inventory_hostname }}"
+# Caddy root folder
+sbws_root: "/var/www/{{ sbws_domain }}"
+# Git repository of sbws
+sbws_git: "https://git.torproject.org/sbws"
+# Git web repository of sbws
+sbws_gitweb: "https://gitweb.torproject.org/sbws.git"
+# Username for sbws usage
+sbws_user: sbws-user
+sbws_home: "/home/{{ sbws_user }}"
+# Virtualenv dir of sbws
+sbws_venv: sbws-venv
+sbws_config_path: /etc/sbws
+sbws_bin: sbws.bin
+sbws_http_timeout: 30
+sbws_circuit_timeout: 50

@@ -1,0 +1,10 @@
+---
+- name: "Deploy and setup sbws"
+  hosts: "{{ target if target is defined else 'sbws' }}"
+  become: true
+  pre_tasks:
+    - name: install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+  roles:
+    - sbws-ansible

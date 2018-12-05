@@ -1,0 +1,57 @@
+---
+
+- name: create user "{{ sbws_user }}"
+  user:
+    name: "{{ sbws_user }}"
+    create_home: yes
+    comment: "Used to run sbws"
+    state: present
+
+- name: create "{{ sbws_config_path }}"
+  file:
+    state: directory
+    path: "{{ item }}"
+  with_items:
+    - "{{ sbws_config_path }}"
+    - "{{ sbws_root }}"
+
+- name: allow 'sudo' group to have passwordless access to "{{ sbws_user }}"
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: "%sudo ALL=({{sbws_user }}) NOPASSWD:ALL"
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: install sbws via pip
+  become_user: "{{ sbws_user }}"
+  pip:
+    virtualenv: "{{ sbws_home }}/{{ sbws_venv }}"
+    virtualenv_python: python3.6
+    chdir: "{{ sbws_home }}"
+    name:
+      - "stem>=1.7.0"
+      - "requests[socks]>=2.11.0"
+      - "git+{{ sbws_git }}"
+
+- name: generate "{{ sbws_bin }}" file
+  shell: "head -c $((1*1024*1024*1024)) /dev/urandom > {{ sbws_bin }}"
+  args:
+    chdir: "{{ sbws_root }}"
+    creates: "{{ sbws_bin }}"
+
+- name: template sbws specific files
+  template:
+    src: "{{ item.src }}.j2"
+    dest: "{{ item.dest }}/{{ item.src }}"
+    mode: 0644
+  with_items:
+    - { src: sbws.ini, dest: "{{ sbws_config_path }}" }
+    - { src: sbws.service, dest: /etc/systemd/system }
+    - { src: index.html, dest: "{{ sbws_root }}" }
+
+- name: start and enable sbws service on boot
+  systemd:
+    name: sbws.service
+    daemon_reload: yes
+    state: started
+    enabled: yes

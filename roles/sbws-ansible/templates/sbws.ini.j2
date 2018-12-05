@@ -1,0 +1,130 @@
+# File managed by Ansible
+
+[paths]
+sbws_home = {{ sbws_home }}
+datadir = ${sbws_home}/datadir
+v3bw_dname = ${sbws_home}/v3bw
+# The latest bandwidth file is atomically symlinked to
+# V3BandwidthsFile ${v3bw_dname}/latest.v3bw
+v3bw_fname = ${v3bw_dname}/{}.v3bw
+state_fname = ${sbws_home}/state.dat
+log_dname = ${sbws_home}/log
+
+[destinations]
+# How often to check if a destional is usable
+usability_test_interval = 300
+https = on
+
+[destinations.https]
+url = https://{{ sbws_domain }}/{{ sbws_bin }}
+
+[general]
+# Days into the past that measurements are considered valid
+data_period = 5
+# Timeout in seconds to give to the python Requests library. It MUST be a
+# single float. Requests will use it both as the connect() timeout and the
+# timeout between bytes received from the server. See
+# http://docs.python-requests.org/en/master/user/advanced/#timeouts
+http_timeout = {{ sbws_http_timeout }}
+# Timeout in seconds for waiting on a circuit to be built. It MUST be an
+# **int**. We will use this both as the CircuitBuildTimeout and a timeout
+# to give to stem for waiting on a circuit to be built since
+# CircuitBuildTimeout doesn't handle the case of a TLS connection to a relay
+# taking forever, and probably other not-yet-discovered cases.
+circuit_timeout = {{ sbws_circuit_timeout }}
+# Whether or not to reset the bandwidth measurements when the relay's IP
+# address changes. If it changes, we only consider results for the relay that
+# we obtained while the relay was located at its most recent IP address.
+# This is NOT implemented for IPv6.
+reset_bw_ipv4_changes = on
+reset_bw_ipv6_changes = off
+
+[scanner]
+# A human-readable string with chars in a-zA-Z0-9 to identify your scanner
+{% if sbws_nickname is defined %}
+nickname = {{ sbws_nickname |regex_replace('[^a-zA-Z0-9]', '') |truncate(19, True, '') }}
+{% else %}
+nickname = IDidntEditTheSBWSConfig
+{% endif %}
+# Limits on what download times are too fast/slow/etc.
+download_toofast = 1
+download_min = 5
+download_target = 6
+download_max = 10
+# How many RTT measurements to make
+num_rtts = 0
+# Number of downloads with acceptable times we must have for a relay before
+# moving on
+num_downloads = 5
+# The number of bytes to initially request from the server
+initial_read_request = 16384
+# How many measurements to make in parallel
+measurement_threads = 3
+# Minimum number of bytes we should ever try to download in a measurement
+min_download_size = 1
+# Maximum number of bytes we should ever try to download in a measurement
+# 1073741824 == 1 GiB
+max_download_size = 1073741824
+
+[tor]
+datadir = ${paths:sbws_home}/tor
+run_dpath = ${datadir}
+control_socket = ${tor:run_dpath}/control
+pid = ${tor:run_dpath}/tor.pid
+# note this is a directory
+log = ${tor:datadir}/log
+#extra_lines =
+
+[cleanup]
+# After this many days, compress data files
+data_files_compress_after_days = 10
+# After this many days, delete data files
+data_files_delete_after_days = 90
+# After this many days, compress v3bw files (1d)
+v3bw_files_compress_after_days = 1
+# After this many days, delete v3bw files (7d)
+v3bw_files_delete_after_days = 7
+
+[relayprioritizer]
+# Whether or not to measure authorities
+measure_authorities = off
+# The target fraction of best priority relays we would like to return.
+# 0.05 is 5%. In a 7000 relay network, 5% is 350 relays.
+#
+# In a network of ~6500 relays and with a ResultDump containing 1 result per
+# relay, the best_priority() function takes ~11 seconds to complete on my
+# home desktop. Using this parameter allows us to balance between calling
+# best_priority() more often (but wasting more CPU), and calling it less
+# often (but taking longer to get back to relays with non-successful results).
+#
+# Alternatively, we could rewrite best_priority() to not suck so much.
+fraction_relays = 0.05
+# The minimum number of best priority relays we are willing to return
+min_relays = 50
+
+[logging]
+# Whether or not to log to a rotating file the directory paths.log_dname
+to_file = no
+# Whether or not to log to stdout
+to_stdout = yes
+# Whether or not to log to syslog
+to_syslog = no
+# If logging to file, how large (in bytes) should the file be allowed to get
+# before rotating to a new one. 10485760 is 10 MiB. If zero or number of
+# backups is zero, never rotate the log file.
+to_file_max_bytes = 10485760
+# If logging to file, how many backups to keep. If zero or max bytes is zero,
+# never rotate the log file.
+to_file_num_backups = 50
+# Level to log at. Debug, info, warning, error, critical.
+level = info
+to_file_level = ${level}
+to_stdout_level = ${level}
+to_syslog_level = ${level}
+# Format string to use when logging
+format = [%(asctime)s] [%(name)s] [%(levelname)s] %(message)s
+to_file_format = ${format}
+to_stdout_format = ${format}
+to_syslog_format = %(module)s[%(process)s]: <%(levelname)s> %(message)s
+# verbose formatter useful for debugging
+#format = %(asctime)s %(levelname)s %(threadName)s %(filename)s:%(lineno)s - %(funcName)s - %(message)s
