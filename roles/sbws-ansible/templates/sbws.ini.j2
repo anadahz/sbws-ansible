@@ -117,14 +117,17 @@ to_file_max_bytes = 10485760
 # never rotate the log file.
 to_file_num_backups = 50
 # Level to log at. Debug, info, warning, error, critical.
-level = info
+level = {{ sbws_log_level }}
 to_file_level = ${level}
 to_stdout_level = ${level}
 to_syslog_level = ${level}
 # Format string to use when logging
+{% if sbws_verbose_format %}
+# verbose formatter useful for debugging
+format = %(asctime)s %(levelname)s %(threadName)s %(filename)s:%(lineno)s - %(funcName)s - %(message)s
+{% else %}
 format = [%(asctime)s] [%(name)s] [%(levelname)s] %(message)s
+{% endif %}
 to_file_format = ${format}
 to_stdout_format = ${format}
 to_syslog_format = %(module)s[%(process)s]: <%(levelname)s> %(message)s
-# verbose formatter useful for debugging
-#format = %(asctime)s %(levelname)s %(threadName)s %(filename)s:%(lineno)s - %(funcName)s - %(message)s

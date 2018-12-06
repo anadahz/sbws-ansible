@@ -37,6 +37,9 @@ sbws_config_path: /etc/sbws
 sbws_bin: sbws.bin
 sbws_http_timeout: 30
 sbws_circuit_timeout: 50
+# sbws log level: debug, info, warning, error, critical
+sbws_log_level: info
+sbws_verbose_format: no
 
 # Install vnstat and configure graphs
 vnstat_install: no
