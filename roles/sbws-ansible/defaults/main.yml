@@ -40,6 +40,11 @@ sbws_circuit_timeout: 50
 # sbws log level: debug, info, warning, error, critical
 sbws_log_level: info
 sbws_verbose_format: no
+# Enable sbws service restart
+# Workaround for https://trac.torproject.org/projects/tor/ticket/28663
+sbws_service_watchdog: yes
+# Watchdog timeout in seconds
+sbws_service_watchdog_sec: 21600
 
 # Install vnstat and configure graphs
 vnstat_install: no

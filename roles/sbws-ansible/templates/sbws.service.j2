@@ -8,6 +8,10 @@ Environment="SUPERVISED=1"
 # Do not set a config option see: https://trac.torproject.org/projects/tor/ticket/28724
 ExecStart={{ sbws_home }}/{{ sbws_venv }}/bin/python {{ sbws_home }}/{{ sbws_venv }}/bin/sbws scanner
 User={{ sbws_user }}
+{% if sbws_service_watchdog %}
+Restart=always
+RuntimeMaxSec={{ sbws_service_watchdog_sec }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target
